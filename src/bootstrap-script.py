@@ -409,23 +409,11 @@ class KeycloakBootstrap:
         """Assigns the master user to the organization."""
         self.create_org()
 
-
-def write_realm_json(realm_json: Dict[str, Any]) -> None:
-    """Writes the realm JSON configuration to a file."""
-    try:
-        with open('keycloak-realm-new3.json', 'w') as f:
-            json.dump(realm_json, f, indent=4)
-        logging.info("Realm JSON configuration written to 'keycloak-realm-new.json'.")
-    except Exception as e:
-        logging.error(f"Error writing realm JSON to file: {e}")
-        raise
-
 def main() -> None:
     try:
         config = Config()
         realm_builder = KeycloakRealm(config)
         realm_json = realm_builder.build_realm_json()
-        write_realm_json(realm_json)
         keycloak_bootstrap = KeycloakBootstrap(config, realm_json)
         keycloak_bootstrap.bootstrap()
     except Exception as e:
