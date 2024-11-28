@@ -43,22 +43,18 @@ class Config:
         """Loads configuration from environment variables."""
         try:
             self.WELL_KNOWN_URLS: Dict[str, str] = json.loads(os.environ.get('WELL_KNOWN_URLS', '{}'))
-            self.ZDL_CONFIG: Dict[str, Any] = json.loads(os.environ.get('ZDL_CONFIG', '{}'))
         except json.JSONDecodeError as e:
             logging.error(f"Invalid JSON in environment variables: {e}")
             raise
 
         # Keycloak Connection Config
         self.KEYCLOAK_BASE_URL: str = self.WELL_KNOWN_URLS.get('zekoder-keycloak-service-base-url', '')
-        self.REALM_NAME: str = self.ZDL_CONFIG.get('solution', {}).get('name', '')
+        self.REALM_NAME: str = os.environ.get('SOLUTION_NAME', '')
 
         # Validate required configurations
         if not self.KEYCLOAK_BASE_URL:
             logging.error("KEYCLOAK_BASE_URL is not set in WELL_KNOWN_URLS.")
             raise ValueError("KEYCLOAK_BASE_URL is not set.")
-        if not self.REALM_NAME:
-            logging.error("REALM_NAME is not set in ZDL_CONFIG.")
-            raise ValueError("REALM_NAME is not set.")
 
         # Load ZDL Config
         self.SECURITY_CONFIG: Dict[str, Any] = self._get_security_config()
@@ -75,17 +71,11 @@ class Config:
 
     def _get_security_config(self) -> Dict[str, Any]:
         """Returns the security configuration from the ZDL_CONFIG."""
-        security_config = self.ZDL_CONFIG.get('security', {})
-        if not security_config:
-            logging.warning("Security configuration is missing in ZDL_CONFIG.")
-        return security_config
+        return json.loads(os.environ.get('security_scope', '{}'))
 
     def _get_templates_config(self) -> List[Dict[str, Any]]:
         """Returns the templates configuration from the ZDL_CONFIG."""
-        templates_config = self.ZDL_CONFIG.get('templates', [])
-        if not templates_config:
-            logging.warning("Templates configuration is missing in ZDL_CONFIG.")
-        return templates_config
+        return json.loads(os.environ.get('templates_scope', '[]'))
 
     def _get_attributes_config(self) -> Dict[str, Any]:
         """Returns the attributes configuration from the ZDL_CONFIG."""
