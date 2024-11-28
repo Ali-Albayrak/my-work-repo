@@ -195,16 +195,6 @@ class KeycloakRealm:
 
     def _add_master_user(self, user_name: str, password: str, groups: List[str]) -> None:
         """Adds the master user to the realm configuration."""
-        # users_list = self.realm_config.get("users", [])
-        # master_user_config = {
-        #     "username": user_name,
-        #     "enabled": True,
-        #     "credentials": [{"type": "password", "value": password, "temporary": False}],
-        #     "groups": groups
-        # }
-        # users_list.append(master_user_config)
-        # self.realm_config["users"] = users_list
-        
         users_list = self.realm_config.get("users", [{}])
         master_user_config = users_list[-1]
         master_user_config["username"] = user_name
